@@ -212,7 +212,7 @@
     ],
     "Notification": [
       {
-        "matcher": "permission_prompt|agent_needs_input|idle_prompt",
+        "matcher": "permission_prompt|agent_needs_input",
         "hooks": [
           {
             "type": "command",

@@ -280,8 +280,8 @@ slash-командой `/cuckcoder:<имя-workflow> <аргументы>`.
   как незакоммиченные и перепроверить их в основной директории, не коммитя автоматически.
 - `tool-audit-log.sh` пишет JSONL-лог каждого вызова инструмента в
   `~/.claude/cuckcoder/audit/` (с ротацией по дням) для последующего разбора/compliance.
-- `git-state-summary.sh` печатает в начале сессии текущую ветку, worktree'ы и
-  незакоммиченные изменения.
+- `git-state-summary.sh` печатает в начале сессии worktree'ы, default branch и локальные
+  feature-ветки — то, чего нет в нативном git-status харнесса.
 - `tag-version-guard.sh` и `typecheck-on-edit.sh` — dev-tooling именно для разработки этого
   репозитория (сверяют тег `mcp-vX.Y.Z` с `mcp/package.json` и гоняют `tsc --noEmit` по
   `mcp/src`); в остальных проектах, где стоит плагин, молча ничего не делают.

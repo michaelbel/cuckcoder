@@ -1,16 +1,20 @@
 ---
 description: Поставить любой собранный build variant APK на устройство в обход INSTALL_BASELINE_PROFILE_FAILED
 model: claude-haiku-4-5-20251001
-allowed-tools: Bash(adb:*), Bash(find:*), Bash(ls:*), Bash(bash:*), Bash(aapt2:*)
+allowed-tools: Bash(adb:*), Bash(find:*), Bash(ls:*), Bash(bash:*), Bash(aapt2:*), AskUserQuestion
 argument-hint: "[variant, напр. uatRelease | prodDebug | release]"
 disable-model-invocation: true
 ---
 
 Универсальная установка APK для любого Android-проекта. Запускать из корня проекта (или модуля).
 Аргумент `$ARGUMENTS` — имя build variant в любом регистре и с любыми разделителями
-(`uatRelease`, `uat-release`, `prod debug`, `release`). Пусто — если собран один вариант,
-ставится он; иначе печатается список собранных. Без длинных рассуждений — действуй: запусти
-скрипт, при неоднозначности покажи список и остановись.
+(`uatRelease`, `uat-release`, `prod debug`, `release`). Пусто — если собран один release-вариант,
+ставится он; иначе скрипт завершается кодом 2 со списком собранных вариантов — в этом случае
+спроси пользователя через `AskUserQuestion`, какой вариант ставить (один вопрос, один option на
+вариант, без preview), и запусти скрипт ещё раз, подставив выбор в `RAW=` вместо `$ARGUMENTS`.
+debug-варианты в автовыбор и в список для вопроса не попадают (бейслайн-профиль, из-за которого
+существует эта команда, у них не ставится) — поставить debug можно только явным аргументом.
+Без длинных рассуждений — действуй.
 
 Почему не через Android Studio: для release-сборок Studio ставит `adb install-multiple base.apk
 base.dm`, где `.dm` — baseline-профиль; на части устройств его установка падает с
@@ -58,13 +62,22 @@ if [ -z "$VARIANTS" ]; then
 fi
 
 # --- выбор варианта ---
+# release-варианты: только на них ставится бейслайн-профиль, ради которого существует эта
+# команда — debug сюда не попадает ни в автовыбор, ни в список для вопроса пользователю.
+RELEASE_VARIANTS=$(printf '%s\n' "$VARIANTS" | awk -F'\t' 'tolower($1) !~ /debug/')
+
 if [ -z "$NORM" ]; then
-  if [ "$(printf '%s\n' "$VARIANTS" | grep -c .)" -eq 1 ]; then
-    LINE="$VARIANTS"
-  else
-    echo "Укажи build variant. Собраны:"
+  if [ -z "$RELEASE_VARIANTS" ]; then
+    echo "Собраны только debug-варианты (бейслайн-профиль на них не ставится). Собраны:"
     printf '%s\n' "$VARIANTS" | awk -F'\t' '{print "  - " $1}'
+    echo "Чтобы всё же поставить один из них, укажи имя явно."
     exit 1
+  elif [ "$(printf '%s\n' "$RELEASE_VARIANTS" | grep -c .)" -eq 1 ]; then
+    LINE="$RELEASE_VARIANTS"
+  else
+    echo "Несколько release-вариантов собрано:"
+    printf '%s\n' "$RELEASE_VARIANTS" | awk -F'\t' '{print "  - " $1}'
+    exit 2
   fi
 else
   LINE=$(printf '%s\n' "$VARIANTS" | awk -F'\t' -v n="$NORM" 'tolower($1)==n')
@@ -137,6 +150,12 @@ adb shell monkey -p "$APP_ID" -c android.intent.category.LAUNCHER 1 >/dev/null 2
 echo "Готово: $APP_ID ($VARIANT)"
 ```
 
+Если скрипт завершился кодом 2 (несколько release-вариантов, аргумент не задан):
+- вызови `AskUserQuestion` одним вопросом «Какой вариант поставить?» с header `"Вариант"`,
+  перечислив ровно те варианты, что вывел скрипт (по одному option на вариант, без preview);
+- запусти скрипт заново целиком, заменив в нём строку `RAW="$ARGUMENTS"` на
+  `RAW="<выбор пользователя>"` — так он поставит именно выбранный APK.
+
 Замечания:
 - Ровно одно устройство, или задай `ANDROID_SERIAL` (его `adb` подхватывает автоматически).
 - `applicationId` берётся из `output-metadata.json` рядом с APK — суффиксы flavor/buildType
@@ -144,3 +163,6 @@ echo "Готово: $APP_ID ($VARIANT)"
 - Ищутся все модули: `*/build/outputs/apk/**`, затем `*/build/intermediates/apk/**` (сборка Studio).
   При коллизии имён вариантов между модулями берётся первый — запусти команду из каталога модуля.
 - `-r` сохраняет данные приложения, `-d` разрешает downgrade по versionCode.
+- В автовыбор и в список для вопроса попадают только не-debug варианты (имя без `debug`, без учёта
+  регистра) — именно на них ставится бейслайн-профиль. Поставить debug-вариант можно только явным
+  аргументом (`/install-apk debug` и т.п.).

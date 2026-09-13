@@ -17,7 +17,7 @@ workflow-пайплайны, guardrail-хуки и MCP-сервер для ра�
 | [Скиллы](#скиллы)         | `skills/`     | 19      | Пошаговые инструкции для конкретных задач реализации             |
 | [Агенты](#агенты)         | `agents/`     | 22      | Саб-агенты с отдельной ролью, зоной ответственности и tools      |
 | [Workflows](#workflows)   | `workflows/`  | 8       | Многошаговые агентные пайплайны (sweeps) поверх саб-агентов       |
-| [Hooks](#hooks)           | `hooks/`      | 8       | Guardrails и напоминания, встроенные в цикл вызова инструментов  |
+| [Hooks](#hooks)           | `hooks/`      | 7       | Guardrails и напоминания, встроенные в цикл вызова инструментов  |
 | [Scripts](#scripts)       | `scripts/`    | 2       | Standalone-установщик и генератор адаптеров правил для consumer-проектов |
 | [MCP-сервер](#mcp-сервер) | `mcp/`        | —       | Отдаёт правила и скиллы агенту по требованию через `list`/`get_*` |
 
@@ -280,9 +280,8 @@ slash-командой `/cuckcoder:<имя-workflow> <аргументы>`.
   `~/.claude/cuckcoder/audit/` (с ротацией по дням) для последующего разбора/compliance.
 - `git-state-summary.sh` печатает в начале сессии worktree'ы, default branch и локальные
   feature-ветки — то, чего нет в нативном git-status харнесса.
-- `tag-version-guard.sh` и `typecheck-on-edit.sh` — dev-tooling именно для разработки этого
-  репозитория (сверяют тег `mcp-vX.Y.Z` с `mcp/package.json` и гоняют `tsc --noEmit` по
-  `mcp/src`); в остальных проектах, где стоит плагин, молча ничего не делают.
+- `typecheck-on-edit.sh` — dev-tooling именно для разработки этого репозитория (гоняет
+  `tsc --noEmit` по `mcp/src`); в остальных проектах, где стоит плагин, молча ничего не делает.
 
 ## Scripts
 

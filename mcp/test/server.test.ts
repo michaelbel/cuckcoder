@@ -13,11 +13,20 @@ async function connectedClient(source = new BundledSource("mcp-vtest")) {
   return { client, server };
 }
 
-test("the tool surface is exactly list, get_rule, get_skill (no run_skill)", async () => {
+test("the tool surface is exactly list, get_rule, get_skill, list_agents, get_agent, list_workflows, get_workflow, search (no run_skill)", async () => {
   const { client } = await connectedClient();
   const { tools } = await client.listTools();
   const names = tools.map((tool) => tool.name).sort();
-  assert.deepEqual(names, ["get_rule", "get_skill", "list"]);
+  assert.deepEqual(names, [
+    "get_agent",
+    "get_rule",
+    "get_skill",
+    "get_workflow",
+    "list",
+    "list_agents",
+    "list_workflows",
+    "search",
+  ]);
 });
 
 test("every tool declares readOnlyHint, openWorldHint, inputSchema, and outputSchema", async () => {
@@ -124,4 +133,93 @@ test("get_rule rejects deprecated uppercase rule names with INVALID_NAME", async
   const text = (result.content as Array<{ type: string; text: string }>)[0].text;
   const payload = JSON.parse(text);
   assert.equal(payload.code, "INVALID_NAME");
+});
+
+test("list_agents returns structuredContent with the real agent count", async () => {
+  const { client } = await connectedClient();
+  const result = await client.callTool({ name: "list_agents", arguments: {} });
+  assert.equal(result.isError, undefined);
+  const structured = result.structuredContent as { agents: Array<{ name: string; description: string }> };
+  assert.ok(structured.agents.some((agent) => agent.name === "kotlin-engineer"));
+  assert.ok(structured.agents.every((agent) => agent.description.length > 0));
+});
+
+test("get_agent('kotlin-engineer') reads the kotlin-engineer agent", async () => {
+  const { client } = await connectedClient();
+  const result = await client.callTool({ name: "get_agent", arguments: { name: "kotlin-engineer" } });
+  assert.equal(result.isError, undefined);
+  const structured = result.structuredContent as { name: string; description: string; content: string };
+  assert.equal(structured.name, "kotlin-engineer");
+  assert.ok(structured.content.length > 0);
+});
+
+test("get_agent returns NOT_FOUND for an unknown agent", async () => {
+  const { client } = await connectedClient();
+  const result = await client.callTool({ name: "get_agent", arguments: { name: "does-not-exist" } });
+  assert.equal(result.isError, true);
+  const text = (result.content as Array<{ type: string; text: string }>)[0].text;
+  const payload = JSON.parse(text);
+  assert.equal(payload.code, "NOT_FOUND");
+});
+
+test("get_agent rejects path traversal with INVALID_NAME", async () => {
+  const { client } = await connectedClient();
+  const result = await client.callTool({ name: "get_agent", arguments: { name: "../../etc/passwd" } });
+  assert.equal(result.isError, true);
+  const text = (result.content as Array<{ type: string; text: string }>)[0].text;
+  const payload = JSON.parse(text);
+  assert.equal(payload.code, "INVALID_NAME");
+});
+
+test("list_workflows returns structuredContent with the real workflow count", async () => {
+  const { client } = await connectedClient();
+  const result = await client.callTool({ name: "list_workflows", arguments: {} });
+  assert.equal(result.isError, undefined);
+  const structured = result.structuredContent as { workflows: Array<{ name: string; description: string }> };
+  assert.ok(structured.workflows.some((workflow) => workflow.name === "full-review"));
+  assert.ok(structured.workflows.every((workflow) => workflow.description.length > 0));
+});
+
+test("get_workflow('full-review') reads the full-review workflow", async () => {
+  const { client } = await connectedClient();
+  const result = await client.callTool({ name: "get_workflow", arguments: { name: "full-review" } });
+  assert.equal(result.isError, undefined);
+  const structured = result.structuredContent as { name: string; description: string; whenToUse: string; content: string };
+  assert.equal(structured.name, "full-review");
+  assert.ok(structured.whenToUse.length > 0);
+  assert.ok(structured.content.includes("export const meta"));
+});
+
+test("get_workflow returns NOT_FOUND for an unknown workflow", async () => {
+  const { client } = await connectedClient();
+  const result = await client.callTool({ name: "get_workflow", arguments: { name: "does-not-exist" } });
+  assert.equal(result.isError, true);
+  const text = (result.content as Array<{ type: string; text: string }>)[0].text;
+  const payload = JSON.parse(text);
+  assert.equal(payload.code, "NOT_FOUND");
+});
+
+test("get_workflow rejects path traversal with INVALID_NAME", async () => {
+  const { client } = await connectedClient();
+  const result = await client.callTool({ name: "get_workflow", arguments: { name: "../../etc/passwd" } });
+  assert.equal(result.isError, true);
+  const text = (result.content as Array<{ type: string; text: string }>)[0].text;
+  const payload = JSON.parse(text);
+  assert.equal(payload.code, "INVALID_NAME");
+});
+
+test("search('dispatch') finds the mvi rule", async () => {
+  const { client } = await connectedClient();
+  const result = await client.callTool({ name: "search", arguments: { query: "dispatch" } });
+  assert.equal(result.isError, undefined);
+  const structured = result.structuredContent as { results: Array<{ type: string; name: string; snippet: string }> };
+  assert.ok(structured.results.some((r) => r.type === "rule" && r.name === "mvi"));
+});
+
+test("search returns an empty result set for a query matching nothing", async () => {
+  const { client } = await connectedClient();
+  const result = await client.callTool({ name: "search", arguments: { query: "xyzzy-nonexistent-term" } });
+  assert.equal(result.isError, undefined);
+  const structured = result.structuredContent as { results: unknown[] };
+  assert.deepEqual(structured.results, []);
 });

@@ -45,3 +45,31 @@ export function validateRuleName(rawName: string): string {
 
   return rawName;
 }
+
+/** Agent name: the lowercase kebab-case basename without `.md`, e.g. `kotlin-engineer`. */
+const AGENT_NAME_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+
+export function validateAgentName(rawName: string): string {
+  if (!AGENT_NAME_PATTERN.test(rawName)) {
+    throw new WorkflowError(
+      "INVALID_NAME",
+      `Invalid agent name '${rawName}'. Expected a lowercase kebab-case agent name, e.g. 'kotlin-engineer'.`
+    );
+  }
+
+  return rawName;
+}
+
+/** Workflow name: the lowercase kebab-case basename without `.js`, e.g. `full-review`. */
+const WORKFLOW_NAME_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+
+export function validateWorkflowName(rawName: string): string {
+  if (!WORKFLOW_NAME_PATTERN.test(rawName)) {
+    throw new WorkflowError(
+      "INVALID_NAME",
+      `Invalid workflow name '${rawName}'. Expected a lowercase kebab-case workflow name, e.g. 'full-review'.`
+    );
+  }
+
+  return rawName;
+}

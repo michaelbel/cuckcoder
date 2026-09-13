@@ -1,7 +1,17 @@
 import { WorkflowError } from "../errors.js";
 import { parseFrontmatter } from "../frontmatter.js";
+import { parseWorkflowMeta } from "../workflow-meta.js";
 import { GithubClient } from "./github.js";
-import type { SkillContent, SkillSummary, SourceInfo, WorkflowSource } from "./types.js";
+import type {
+  AgentContent,
+  AgentSummary,
+  SkillContent,
+  SkillSummary,
+  SourceInfo,
+  WorkflowContent,
+  WorkflowSource,
+  WorkflowSummary,
+} from "./types.js";
 
 const OWNER = "michaelbel";
 const REPO = "cuckcoder";
@@ -71,5 +81,88 @@ export class GithubSource implements WorkflowSource {
 
     const { fields, body } = parseFrontmatter(raw);
     return { description: fields.description ?? "", content: body.trim() };
+  }
+
+  async listAgents(): Promise<AgentSummary[]> {
+    const tree = await this.client.listTree(this.ref);
+    const paths = tree
+      .filter((item) => item.type === "blob" && /^agents\/[a-z0-9]+(?:-[a-z0-9]+)*\.md$/.test(item.path))
+      .map((item) => item.path)
+      .sort();
+
+    const summaries: AgentSummary[] = [];
+    for (const path of paths) {
+      const name = path.replace(/^agents\//, "").replace(/\.md$/, "");
+      const raw = await this.client.fetchFile(this.ref, path);
+      const { fields } = parseFrontmatter(raw);
+      summaries.push({ name, description: fields.description ?? "" });
+    }
+    return summaries;
+  }
+
+  async getAgent(name: string): Promise<AgentContent> {
+    let raw: string;
+    try {
+      raw = await this.client.fetchFile(this.ref, `agents/${name}.md`);
+    } catch (error) {
+      if (error instanceof WorkflowError && error.code === "NOT_FOUND") {
+        throw new WorkflowError("NOT_FOUND", `Agent '${name}' was not found at ref '${this.ref}'.`);
+      }
+      throw error;
+    }
+
+    const { fields, body } = parseFrontmatter(raw);
+    return {
+      description: fields.description ?? "",
+      tools: fields.tools ?? "",
+      disallowedTools: fields.disallowedTools ?? "",
+      content: body.trim(),
+    };
+  }
+
+  async listWorkflows(): Promise<WorkflowSummary[]> {
+    const tree = await this.client.listTree(this.ref);
+    const paths = tree
+      .filter((item) => item.type === "blob" && /^workflows\/[a-z0-9]+(?:-[a-z0-9]+)*\.js$/.test(item.path))
+      .map((item) => item.path)
+      .sort();
+
+    const summaries: WorkflowSummary[] = [];
+    for (const path of paths) {
+      const name = path.replace(/^workflows\//, "").replace(/\.js$/, "");
+      const raw = await this.client.fetchFile(this.ref, path);
+      try {
+        const meta = parseWorkflowMeta(raw);
+        summaries.push({ name, description: meta.description });
+      } catch {
+        // A workflow file whose meta block can't be parsed is not listed; get_workflow will
+        // still surface an error if it's requested directly.
+      }
+    }
+    return summaries;
+  }
+
+  async getWorkflow(name: string): Promise<WorkflowContent> {
+    let raw: string;
+    try {
+      raw = await this.client.fetchFile(this.ref, `workflows/${name}.js`);
+    } catch (error) {
+      if (error instanceof WorkflowError && error.code === "NOT_FOUND") {
+        throw new WorkflowError("NOT_FOUND", `Workflow '${name}' was not found at ref '${this.ref}'.`);
+      }
+      throw error;
+    }
+
+    let meta: { description: string; whenToUse: string };
+    try {
+      meta = parseWorkflowMeta(raw);
+    } catch (error) {
+      throw new WorkflowError(
+        "INTERNAL_ERROR",
+        `Workflow '${name}' has an unparsable meta block: ${error instanceof Error ? error.message : String(error)}`
+      );
+    }
+
+    return { description: meta.description, whenToUse: meta.whenToUse, content: raw };
   }
 }

@@ -86,3 +86,49 @@ test("BundledSource.info() reports kind 'bundled'", () => {
   const source = new BundledSource("mcp-vtest");
   assert.deepEqual(source.info(), { kind: "bundled", ref: "mcp-vtest" });
 });
+
+test("BundledSource.listAgents() matches the flat .md files in assets/agents (no hardcoded count)", async () => {
+  const source = new BundledSource("mcp-vtest");
+  const agents = await source.listAgents();
+  const expected = readdirSync(join(assetsDir, "agents")).filter((entry) => entry.endsWith(".md")).length;
+  assert.equal(agents.length, expected);
+  assert.ok(agents.some((agent) => agent.name === "kotlin-engineer"));
+  assert.ok(agents.every((agent) => agent.description.length > 0));
+});
+
+test("BundledSource.getAgent('kotlin-engineer') reads assets/agents/kotlin-engineer.md", async () => {
+  const source = new BundledSource("mcp-vtest");
+  const agent = await source.getAgent("kotlin-engineer");
+  assert.ok(agent.description.length > 0);
+  assert.ok(agent.content.length > 0);
+});
+
+test("BundledSource.getAgent() throws NOT_FOUND for an unknown agent", async () => {
+  const source = new BundledSource("mcp-vtest");
+  await assert.rejects(() => source.getAgent("does-not-exist"), (error: unknown) => {
+    return error instanceof Error && (error as { code?: string }).code === "NOT_FOUND";
+  });
+});
+
+test("BundledSource.listWorkflows() matches the flat .js files in assets/workflows (no hardcoded count)", async () => {
+  const source = new BundledSource("mcp-vtest");
+  const workflows = await source.listWorkflows();
+  const expected = readdirSync(join(assetsDir, "workflows")).filter((entry) => entry.endsWith(".js")).length;
+  assert.equal(workflows.length, expected);
+  assert.ok(workflows.some((workflow) => workflow.name === "full-review"));
+  assert.ok(workflows.every((workflow) => workflow.description.length > 0));
+});
+
+test("BundledSource.getWorkflow('full-review') reads assets/workflows/full-review.js", async () => {
+  const source = new BundledSource("mcp-vtest");
+  const workflow = await source.getWorkflow("full-review");
+  assert.ok(workflow.description.length > 0);
+  assert.ok(workflow.content.includes("export const meta"));
+});
+
+test("BundledSource.getWorkflow() throws NOT_FOUND for an unknown workflow", async () => {
+  const source = new BundledSource("mcp-vtest");
+  await assert.rejects(() => source.getWorkflow("does-not-exist"), (error: unknown) => {
+    return error instanceof Error && (error as { code?: string }).code === "NOT_FOUND";
+  });
+});

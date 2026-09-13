@@ -1,14 +1,16 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { toToolErrorResult } from "./errors.js";
+import { searchRulesAndSkills } from "./search.js";
 import { createSource, type CreateSourceEnv, type WorkflowSource } from "./source/index.js";
-import { validateRuleName, validateSkillName } from "./validation.js";
+import { validateAgentName, validateRuleName, validateSkillName, validateWorkflowName } from "./validation.js";
 import { getServerName, getServerVersion } from "./version.js";
 
 const SERVER_INSTRUCTIONS = [
-  "Use this server as the source of truth for Cuckcoder rules and skills.",
+  "Use this server as the source of truth for Cuckcoder rules, skills, agents, and workflows.",
   "Before any git commit, call get_rule with name 'git' and apply the returned rules.",
   "Before deleting files, call get_rule with name 'filesystem' and apply the returned rules.",
+  "Use search to find relevant rules/skills by keyword instead of guessing names.",
 ].join("\n");
 
 const sourceOutputShape = {
@@ -154,6 +156,188 @@ export function createServer(options: CreateServerOptions = {}): McpServer {
             content: skill.content,
             source: sourceInfo,
           },
+        };
+      } catch (error) {
+        return toToolErrorResult(error);
+      }
+    }
+  );
+
+  // ─── list_agents ───────────────────────────────────────────────────────────
+
+  server.registerTool(
+    "list_agents",
+    {
+      title: "List agents",
+      description: "List all available sub-agent names and descriptions in the Cuckcoder repository.",
+      inputSchema: {},
+      outputSchema: {
+        agents: z.array(z.object({ name: z.string(), description: z.string() })),
+        source: z.object(sourceOutputShape),
+      },
+      annotations: {
+        title: "List agents",
+        readOnlyHint,
+        openWorldHint,
+      },
+    },
+    async () => {
+      try {
+        const agents = await source.listAgents();
+        const structuredContent = { agents, source: sourceInfo };
+        const lines = agents.length
+          ? agents.map((agent) => `- ${agent.name} — ${agent.description}`).join("\n")
+          : "_none_";
+        return {
+          content: [{ type: "text", text: lines }],
+          structuredContent,
+        };
+      } catch (error) {
+        return toToolErrorResult(error);
+      }
+    }
+  );
+
+  // ─── get_agent ─────────────────────────────────────────────────────────────
+
+  server.registerTool(
+    "get_agent",
+    {
+      title: "Get agent definition",
+      description: "Get the role, tools, and full definition of a sub-agent. Use a name from `list_agents`, e.g. 'kotlin-engineer'.",
+      inputSchema: {
+        name: z.string().describe("Lowercase kebab-case agent name, e.g. 'kotlin-engineer'"),
+      },
+      outputSchema: {
+        name: z.string(),
+        description: z.string(),
+        tools: z.string(),
+        disallowedTools: z.string(),
+        content: z.string(),
+        source: z.object(sourceOutputShape),
+      },
+      annotations: {
+        title: "Get agent definition",
+        readOnlyHint,
+        openWorldHint,
+      },
+    },
+    async ({ name }) => {
+      try {
+        const validName = validateAgentName(name);
+        const agent = await source.getAgent(validName);
+        return {
+          content: [{ type: "text", text: agent.content }],
+          structuredContent: { name: validName, ...agent, source: sourceInfo },
+        };
+      } catch (error) {
+        return toToolErrorResult(error);
+      }
+    }
+  );
+
+  // ─── list_workflows ────────────────────────────────────────────────────────
+
+  server.registerTool(
+    "list_workflows",
+    {
+      title: "List workflows",
+      description: "List all available workflow (sweep pipeline) names and descriptions in the Cuckcoder repository.",
+      inputSchema: {},
+      outputSchema: {
+        workflows: z.array(z.object({ name: z.string(), description: z.string() })),
+        source: z.object(sourceOutputShape),
+      },
+      annotations: {
+        title: "List workflows",
+        readOnlyHint,
+        openWorldHint,
+      },
+    },
+    async () => {
+      try {
+        const workflows = await source.listWorkflows();
+        const structuredContent = { workflows, source: sourceInfo };
+        const lines = workflows.length
+          ? workflows.map((workflow) => `- ${workflow.name} — ${workflow.description}`).join("\n")
+          : "_none_";
+        return {
+          content: [{ type: "text", text: lines }],
+          structuredContent,
+        };
+      } catch (error) {
+        return toToolErrorResult(error);
+      }
+    }
+  );
+
+  // ─── get_workflow ──────────────────────────────────────────────────────────
+
+  server.registerTool(
+    "get_workflow",
+    {
+      title: "Get workflow source",
+      description: "Get the description, when-to-use, and full source of a workflow. Use a name from `list_workflows`, e.g. 'full-review'.",
+      inputSchema: {
+        name: z.string().describe("Lowercase kebab-case workflow name, e.g. 'full-review'"),
+      },
+      outputSchema: {
+        name: z.string(),
+        description: z.string(),
+        whenToUse: z.string(),
+        content: z.string(),
+        source: z.object(sourceOutputShape),
+      },
+      annotations: {
+        title: "Get workflow source",
+        readOnlyHint,
+        openWorldHint,
+      },
+    },
+    async ({ name }) => {
+      try {
+        const validName = validateWorkflowName(name);
+        const workflow = await source.getWorkflow(validName);
+        return {
+          content: [{ type: "text", text: workflow.content }],
+          structuredContent: { name: validName, ...workflow, source: sourceInfo },
+        };
+      } catch (error) {
+        return toToolErrorResult(error);
+      }
+    }
+  );
+
+  // ─── search ────────────────────────────────────────────────────────────────
+
+  server.registerTool(
+    "search",
+    {
+      title: "Search rules and skills",
+      description: "Rough case-insensitive keyword search across every rule's and skill's full content. Use instead of guessing a rule/skill name.",
+      inputSchema: {
+        query: z.string().min(1).describe("Keyword or phrase to search for, e.g. 'coroutine scope'"),
+      },
+      outputSchema: {
+        results: z.array(z.object({ type: z.enum(["rule", "skill"]), name: z.string(), snippet: z.string() })),
+        source: z.object(sourceOutputShape),
+      },
+      annotations: {
+        title: "Search rules and skills",
+        readOnlyHint,
+        openWorldHint,
+      },
+    },
+    async ({ query }) => {
+      try {
+        const results = await searchRulesAndSkills(source, query);
+        const structuredContent = { results, source: sourceInfo };
+        const lines = results.length
+          ? results.map((result) => `- [${result.type}] ${result.name}: ${result.snippet}`).join("\n")
+          : "_no matches_";
+        return {
+          content: [{ type: "text", text: lines }],
+          structuredContent,
         };
       } catch (error) {
         return toToolErrorResult(error);

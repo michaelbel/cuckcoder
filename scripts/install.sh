@@ -5,7 +5,8 @@
 #   bash <(curl -fsSL https://raw.githubusercontent.com/michaelbel/cuckcoder/main/scripts/install.sh) <tool>
 #
 # Cuckcoder раздаётся прежде всего как MCP-сервер (`npx -y @michaelbel/cuckcoder-mcp`),
-# который отдаёт правила и скиллы по требованию через `list`/`get_rule`/`get_skill`.
+# который отдаёт правила, скиллы, агентов и workflow по требованию (`list`/`get_rule`/`get_skill`,
+# `list_agents`/`get_agent`, `list_workflows`/`get_workflow`, `search`).
 # Этот скрипт лишь прописывает сервер в конфиг нужного клиента и, где клиент умеет читать
 # локальную папку скиллов, копирует `skills/`.
 #
@@ -32,7 +33,7 @@ print_help() {
 
 Матрица возможностей:
   Возможность                      claude  codex  cursor  gemini  windsurf  kimi
-  MCP-сервер (list/get_rule/skill)   ✓      ✓      ✓       ✓       ✓         ✓
+  MCP-сервер (все инструменты)       ✓      ✓      ✓       ✓       ✓         ✓
   Локальные skills/                  ✓      ✓      ✓       ✓       —         ✓
   Агенты (саб-агенты)               ✓ (*)   —      —       —       —         —
   Хуки                              ✓ (*)   —      —       —       —         —
@@ -162,4 +163,4 @@ esac
 
 echo ""
 echo "Готово. cuckcoder подключён для: $TOOL"
-echo "Проверка MCP: npx -y $PKG  (stdio-сервер; клиент вызовет list/get_rule/get_skill сам)"
+echo "Проверка MCP: npx -y $PKG  (stdio-сервер; клиент вызовет нужные инструменты сам)"

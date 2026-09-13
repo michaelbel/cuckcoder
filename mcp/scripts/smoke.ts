@@ -92,9 +92,19 @@ async function main(): Promise<void> {
 
     const result = listResponse.result as { tools: Array<Record<string, unknown>> };
     const toolNames = result.tools.map((tool) => tool.name).sort();
+    const expectedToolNames = [
+      "get_agent",
+      "get_rule",
+      "get_skill",
+      "get_workflow",
+      "list",
+      "list_agents",
+      "list_workflows",
+      "search",
+    ];
     assert(
-      JSON.stringify(toolNames) === JSON.stringify(["get_rule", "get_skill", "list"]),
-      `expected exactly ['get_rule', 'get_skill', 'list'], got ${JSON.stringify(toolNames)}`
+      JSON.stringify(toolNames) === JSON.stringify(expectedToolNames),
+      `expected exactly ${JSON.stringify(expectedToolNames)}, got ${JSON.stringify(toolNames)}`
     );
 
     for (const tool of result.tools) {

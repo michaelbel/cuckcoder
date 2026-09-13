@@ -71,8 +71,9 @@ args = ["-y", "@michaelbel/cuckcoder-mcp"]
 
 ### Windsurf
 
-Нативного формата плагинов/skills у Windsurf нет — доступ к правилам и скиллам идёт только через
-MCP-инструменты `list`/`get_rule`/`get_skill`. Добавьте сервер в `~/.codeium/windsurf/mcp_config.json`
+Нативного формата плагинов/skills у Windsurf нет — доступ к правилам, скиллам, агентам и workflow
+идёт только через MCP-инструменты (`list`/`get_rule`/`get_skill`, `list_agents`/`get_agent`,
+`list_workflows`/`get_workflow`, `search`). Добавьте сервер в `~/.codeium/windsurf/mcp_config.json`
 (создайте файл, если его нет; конфиг общий на все проекты и применяется без перезапуска редактора):
 
 ```json
@@ -160,24 +161,34 @@ push), обновляя чекаут `~/.claude` на этой машине. `cs
 
 ### Инструменты
 
-| Инструмент  | Описание                                                                  |
-| ----------- | ------------------------------------------------------------------------- |
-| `list`      | Список всех доступных имён правил и скиллов (с описаниями скиллов)        |
-| `get_rule`  | Получить содержимое правила по имени вида `mvi`                           |
-| `get_skill` | Получить инструкции скилла по имени вида `create-feature-scaffold-screen` |
+| Инструмент       | Описание                                                                     |
+| ---------------- | ------------------------------------------------------------------------------ |
+| `list`           | Список всех доступных имён правил и скиллов (с описаниями скиллов)             |
+| `get_rule`       | Получить содержимое правила по имени вида `mvi`                                |
+| `get_skill`      | Получить инструкции скилла по имени вида `create-feature-scaffold-screen`      |
+| `list_agents`    | Список всех саб-агентов репозитория с описаниями                               |
+| `get_agent`      | Получить роль, tools и полное определение агента по имени вида `kotlin-engineer` |
+| `list_workflows` | Список всех workflow-пайплайнов репозитория с описаниями                       |
+| `get_workflow`   | Получить описание, when-to-use и исходник workflow по имени вида `full-review` |
+| `search`         | Грубый keyword-поиск по содержимому всех правил и скиллов сразу                |
 
-Каждый вызов инструмента возвращает и человекочитаемый `content` (Markdown), и `structuredContent`
-с тем же результатом в виде структуры:
+Каждый вызов инструмента возвращает и человекочитаемый `content` (Markdown/текст), и
+`structuredContent` с тем же результатом в виде структуры:
 
 ```ts
-list      -> { rules: string[], skills: { name: string, description: string }[], source: { kind: "bundled" | "github", ref: string } }
-get_rule  -> { name: string, content: string, source: { kind, ref } }
-get_skill -> { name: string, description: string, content: string, source: { kind, ref } }
+list           -> { rules: string[], skills: { name: string, description: string }[], source: { kind: "bundled" | "github", ref: string } }
+get_rule       -> { name: string, content: string, source: { kind, ref } }
+get_skill      -> { name: string, description: string, content: string, source: { kind, ref } }
+list_agents    -> { agents: { name: string, description: string }[], source: { kind, ref } }
+get_agent      -> { name: string, description: string, tools: string, disallowedTools: string, content: string, source: { kind, ref } }
+list_workflows -> { workflows: { name: string, description: string }[], source: { kind, ref } }
+get_workflow   -> { name: string, description: string, whenToUse: string, content: string, source: { kind, ref } }
+search         -> { results: { type: "rule" | "skill", name: string, snippet: string }[], source: { kind, ref } }
 ```
 
 Имена скиллов — простые kebab-case имена директорий, например `create-feature-scaffold-screen`, а не путь к
-файлу (`create-feature-scaffold-screen/SKILL`). Имена правил — простые имена файлов без расширения и
-категории, например `mvi`.
+файлу (`create-feature-scaffold-screen/SKILL`). Имена правил, агентов и workflow — простые
+kebab-case имена без расширения и категории, например `mvi`, `kotlin-engineer`, `full-review`.
 
 При ошибке инструмент возвращает `isError: true` с телом
 `{ code, message, retryable, details? }`, где `code` — один из фиксированных кодов: `INVALID_NAME`,
@@ -186,10 +197,10 @@ get_skill -> { name: string, description: string, content: string, source: { kin
 
 ### Источник данных: bundled snapshot vs GitHub
 
-По умолчанию (`bundled`, источник по умолчанию) сервер копирует `rules/` и `skills/` в
-`mcp/assets/` на этапе сборки и публикует их вместе с npm-пакетом — `list`/`get_rule`/`get_skill`
-читают этот снапшот без единого сетевого запроса. Обновление правил и скиллов происходит через
-публикацию новой версии пакета (`mcp-vX.Y.Z`), а не «на лету».
+По умолчанию (`bundled`, источник по умолчанию) сервер копирует `rules/`, `skills/`, `agents/` и
+`workflows/` в `mcp/assets/` на этапе сборки и публикует их вместе с npm-пакетом — все инструменты
+читают этот снапшот без единого сетевого запроса. Обновление правил, скиллов, агентов и workflow
+происходит через публикацию новой версии пакета (`mcp-vX.Y.Z`), а не «на лету».
 
 Опционально сервер можно перевести в режим чтения напрямую с GitHub, установив переменную
 окружения `AI_WORKFLOW_SOURCE=github`. Этот режим:

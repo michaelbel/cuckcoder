@@ -15,9 +15,32 @@ export interface SkillContent {
   content: string;
 }
 
+export interface AgentSummary {
+  name: string;
+  description: string;
+}
+
+export interface AgentContent {
+  description: string;
+  tools: string;
+  disallowedTools: string;
+  content: string;
+}
+
+export interface WorkflowSummary {
+  name: string;
+  description: string;
+}
+
+export interface WorkflowContent {
+  description: string;
+  whenToUse: string;
+  content: string;
+}
+
 /**
- * Abstraction over where rules/skills content is read from: the npm-packaged bundled
- * snapshot (default, no network) or an optional GitHub-backed remote mode.
+ * Abstraction over where rules/skills/agents/workflows content is read from: the npm-packaged
+ * bundled snapshot (default, no network) or an optional GitHub-backed remote mode.
  */
 export interface WorkflowSource {
   info(): SourceInfo;
@@ -25,4 +48,8 @@ export interface WorkflowSource {
   listSkills(): Promise<SkillSummary[]>;
   getRule(name: string): Promise<string>;
   getSkill(name: string): Promise<SkillContent>;
+  listAgents(): Promise<AgentSummary[]>;
+  getAgent(name: string): Promise<AgentContent>;
+  listWorkflows(): Promise<WorkflowSummary[]>;
+  getWorkflow(name: string): Promise<WorkflowContent>;
 }

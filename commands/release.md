@@ -1,7 +1,7 @@
 ---
 description: Поднять версию MCP-пакета, закоммитить, запушить и поставить релизный тег
 model: claude-haiku-4-5-20251001
-allowed-tools: Bash(git status:*), Bash(git rev-parse:*), Bash(git add:*), Bash(git commit:*), Bash(git push:*), Bash(git tag:*), Bash(git log:*), Bash(git checkout:*), Bash(npm:*), Bash(node:*)
+allowed-tools: Bash(git status:*), Bash(git rev-parse:*), Bash(git add:*), Bash(git commit:*), Bash(git push:*), Bash(git tag:*), Bash(git log:*), Bash(git checkout:*), Bash(npm:*), Bash(node:*), Bash(ls:*), Bash(diff:*), Bash(comm:*), Bash(wc:*), Read, Edit, Grep, Glob
 argument-hint: "[X.Y.Z]"
 disable-model-invocation: true
 ---
@@ -14,6 +14,20 @@ disable-model-invocation: true
 - Рабочее дерево чистое (`git status --porcelain` пуст). Есть посторонние изменения — сначала `/commit`.
 
 Шаги:
+- Актуализация README (до бампа версии, отдельным коммитом при необходимости):
+  - Сверь фактические файлы с соответствующими списками/таблицами в `README.md`:
+    `rules/*.md` ↔ раздел «Правила», `skills/*` ↔ раздел «Скиллы», `agents/*.md` ↔ таблица в
+    разделе «Агенты», `workflows/*.js` ↔ таблица в разделе «Workflows». Для «Hooks» источник
+    истины — список хуков в `hooks/hooks.json` (не вся директория `hooks/`: там есть личные
+    dev-хуки вроде `notify-done.sh`, подключённые только через `settings.json`, они в README не
+    документируются).
+  - На каждый добавленный файл — новая строка с кратким описанием в стиле соседних строк; на
+    каждый удалённый — убери строку. Не гадай описание неизвестного тебе агента/скилла — прочитай
+    его frontmatter/первую строку файла.
+  - Пересчитай колонку «Сколько» в таблице «Из чего состоит харнесс» под факт.
+  - Есть изменения — `git add README.md`, коммит `Actualize README with current rules/skills/agents/workflows lists`,
+    последняя строка: Co-Authored-By: Claude Sonnet 5 <noreply@anthropic.com>. Нет изменений —
+    пропусти коммит.
 - `OLD` = `node -p "require('./mcp/package.json').version"`.
 - Бамп (обновит `mcp/package.json` и `mcp/package-lock.json`, печатает новую версию `vNEW`):
   - аргумент задан: `npm --prefix ./mcp version "$ARGUMENTS" --no-git-tag-version`

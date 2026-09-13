@@ -24,17 +24,6 @@
           }
         ]
       }
-    ],
-    "PostToolUse": [
-      {
-        "matcher": "ExitWorktree",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "\"${CLAUDE_PLUGIN_ROOT}\"/hooks/worktree-merge-back-reminder.sh"
-          }
-        ]
-      }
     ]
   }
 }

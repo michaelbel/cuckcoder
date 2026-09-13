@@ -1,4 +1,4 @@
-# Repository Guidelines
+# Правила репозитория
 
 @rules/git.md
 @rules/filesystem.md

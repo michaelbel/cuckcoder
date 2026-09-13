@@ -27,15 +27,6 @@
     ],
     "PostToolUse": [
       {
-        "matcher": "Edit|Write",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "\"${CLAUDE_PLUGIN_ROOT}\"/hooks/typecheck-on-edit.sh"
-          }
-        ]
-      },
-      {
         "matcher": "ExitWorktree",
         "hooks": [
           {

@@ -15,7 +15,7 @@ workflow-пайплайны, guardrail-хуки и MCP-сервер для ра�
 | ------------------------- | ------------- | ------- | ---------------------------------------------------------------- |
 | [Правила](#правила)       | `rules/`      | 35      | Соглашения проекта по Git, GitHub, Kotlin, Compose, KMP, Android |
 | [Скиллы](#скиллы)         | `skills/`     | 19      | Пошаговые инструкции для конкретных задач реализации             |
-| [Агенты](#агенты)         | `agents/`     | 21      | Саб-агенты с отдельной ролью, зоной ответственности и tools      |
+| [Агенты](#агенты)         | `agents/`     | 22      | Саб-агенты с отдельной ролью, зоной ответственности и tools      |
 | [Workflows](#workflows)   | `workflows/`  | 8       | Многошаговые агентные пайплайны (sweeps) поверх саб-агентов       |
 | [Hooks](#hooks)           | `hooks/`      | 10      | Guardrails и напоминания, встроенные в цикл вызова инструментов  |
 | [Scripts](#scripts)       | `scripts/`    | 2       | Standalone-установщик и генератор адаптеров правил для consumer-проектов |
@@ -222,6 +222,7 @@ get_skill -> { name: string, description: string, content: string, source: { kin
 | `code-refine`             | Упрощение уже проверенного кода без изменения поведения                       |
 | `code-reviewer`           | Независимое семантическое ревью изменения по задаче и диффу                   |
 | `compose-builder`         | Production UI на Jetpack Compose / Compose Multiplatform                      |
+| `device-ui-tester`        | Проверка собранного приложения на устройстве/эмуляторе через `mobile` MCP     |
 | `devops-expert`           | CI/CD, release workflows, деплой, секреты, мониторинг                         |
 | `explorer`                | Быстрая карта кодовой базы: определения, callers, потоки данных               |
 | `github-project-manager`  | GitHub Issues и Projects v2: read-only audit и явно запрошенные мутации       |

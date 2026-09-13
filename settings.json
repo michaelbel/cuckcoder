@@ -216,7 +216,6 @@
     "cuckcoder@cuckcoder": true,
     "kotlin-agent-skills@Kotlin": true,
     "mcp-devices@claude-in-mobile": true,
-    "context-mode@context-mode": true,
     "android-skills@android-skills": true,
     "firebase@firebase": true
   },
@@ -239,13 +238,6 @@
         "url": "https://github.com/AlexGladkov/claude-in-mobile.git",
         "ref": "v4.1.0"
       }
-    },
-    "context-mode": {
-      "source": {
-        "source": "github",
-        "repo": "mksglu/context-mode"
-      },
-      "autoUpdate": true
     },
     "android-skills": {
       "source": {

@@ -62,3 +62,13 @@ paths:
   компонентов в одном файле.
 - Создавай новые общие UI-компоненты в `shared/ui/components`; при необходимости группируй их там в
   отдельные подпапки.
+- Для примитивных типов, у которых `androidx.compose.runtime` предоставляет специализированную
+  функцию, всегда используй её вместо обобщённой `mutableStateOf`, чтобы избежать autoboxing:
+  `mutableIntStateOf` для `Int`, `mutableFloatStateOf` для `Float`, `mutableLongStateOf` для `Long`,
+  `mutableDoubleStateOf` для `Double`. Обращайся к значению через типизированное свойство
+  (`intValue`, `floatValue`, `longValue`, `doubleValue`), а не через `value`. Для остальных типов, у
+  которых такой специализированной функции нет, используй обычную `mutableStateOf`.
+
+  ```kotlin
+  var offsetY by remember { mutableFloatStateOf(0F) }
+  ```

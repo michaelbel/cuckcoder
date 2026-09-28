@@ -12,8 +12,10 @@ permissionMode:
 maxTurns: 60
 skills:
 mcpServers:
+hooks:
 memory:
 background:
+omitClaudeMd:
 effort: medium
 isolation:
 color: green

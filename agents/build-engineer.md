@@ -12,8 +12,10 @@ permissionMode:
 maxTurns: 35
 skills: google-r8-analyzer
 mcpServers:
+hooks:
 memory: project
 background:
+omitClaudeMd:
 effort: medium
 isolation:
 color: green

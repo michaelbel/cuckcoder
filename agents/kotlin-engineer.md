@@ -16,8 +16,10 @@ skills: >-
   create-paging-flow, create-signalr-channel, create-data-layer, google-android-camerax,
   kotlin-tooling-java-to-kotlin
 mcpServers:
+hooks:
 memory: project
 background:
+omitClaudeMd:
 effort: medium
 isolation:
 color: purple

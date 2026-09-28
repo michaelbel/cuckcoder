@@ -13,11 +13,13 @@ permissionMode:
 maxTurns: 60
 skills: create-project-from-template
 mcpServers:
+hooks:
 memory: project
 background:
+omitClaudeMd:
 effort:
 isolation:
-color: teal
+color: cyan
 initialPrompt:
 ---
 

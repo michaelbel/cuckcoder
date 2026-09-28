@@ -14,8 +14,10 @@ skills: >-
   create-feature-alert-dialog, create-feature-bottom-sheet, create-feature-scaffold-screen,
   create-shared-component, google-adaptive, google-android-navigation-3, google-android-styles
 mcpServers:
+hooks:
 memory: project
 background:
+omitClaudeMd:
 effort: medium
 isolation:
 color: cyan

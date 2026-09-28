@@ -12,8 +12,10 @@ permissionMode:
 maxTurns: 25
 skills: google-adaptive, google-android-navigation-3
 mcpServers:
+hooks:
 memory: project
 background:
+omitClaudeMd:
 effort: high
 isolation:
 color: cyan

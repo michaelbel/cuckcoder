@@ -13,11 +13,13 @@ permissionMode:
 maxTurns: 30
 skills:
 mcpServers: notion
+hooks:
 memory: project
 background:
+omitClaudeMd:
 effort:
 isolation:
-color: indigo
+color: purple
 initialPrompt:
 ---
 

@@ -12,8 +12,10 @@ permissionMode:
 maxTurns: 30
 skills: google-android-intent-security, google-play-policy-insights
 mcpServers:
+hooks:
 memory: project
 background:
+omitClaudeMd:
 effort: high
 isolation:
 color: red

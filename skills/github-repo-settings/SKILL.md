@@ -1,12 +1,13 @@
 ---
 name: github-repo-settings
 description: >-
-  Use when the user asks to configure a GitHub repository after creation — set its description
-  and topics, disable Wikis, Issues, Discussions, Projects and Pull Requests, hide Releases,
-  Packages and Deployments from the repository home page, enable Sponsorships, or says "configure
-  repo settings" or "set up GitHub repository". Applies and verifies repository-level settings
-  step by step through `gh`, the documented GitHub REST API and browser UI. Do not use for tracked
-  repository files such as README.md, FUNDING.yml, CODEOWNERS or `.github/workflows`.
+  Use when пользователь просит настроить GitHub-репозиторий после создания — задать его description
+  и topics, отключить Wikis, Issues, Discussions, Projects и Pull Requests, скрыть Releases,
+  Packages и Deployments с главной страницы репозитория, включить Sponsorships, либо говорит
+  "configure repo settings" или "set up GitHub repository". Применяет и проверяет настройки уровня
+  репозитория пошагово через `gh`, документированный GitHub REST API и browser UI. Не используй для
+  отслеживаемых файлов репозитория, таких как README.md, FUNDING.yml, CODEOWNERS или
+  `.github/workflows`.
 metadata:
   author: michaelbel
 ---

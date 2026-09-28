@@ -1,8 +1,9 @@
 {
   "tui": "fullscreen",
+  "model": "sonnet",
   "language": "russian",
-  "skipDangerousModePermissionPrompt": true,
   "agentPushNotifEnabled": true,
+  "skipDangerousModePermissionPrompt": true,
   "feedbackDrafts": "off",
   "env": {
     "ENABLE_CLAUDEAI_MCP_SERVERS": "false"
@@ -99,7 +100,6 @@
       "Bash(firebase deploy*)"
     ]
   },
-  "model": "sonnet",
   "hooks": {
     "Stop": [
       {
@@ -217,13 +217,6 @@
       }
     ]
   },
-  "enabledPlugins": {
-    "cuckcoder@cuckcoder": true,
-    "kotlin-agent-skills@Kotlin": true,
-    "mcp-devices@claude-in-mobile": true,
-    "android-skills@android-skills": true,
-    "firebase@firebase": true
-  },
   "extraKnownMarketplaces": {
     "cuckcoder": {
       "source": {
@@ -231,17 +224,17 @@
         "path": "/Users/mihailbelyj/Projects/cuckcoder"
       }
     },
-    "Kotlin": {
-      "source": {
-        "source": "github",
-        "repo": "Kotlin/kotlin-agent-skills"
-      }
-    },
     "claude-in-mobile": {
       "source": {
         "source": "git",
         "url": "https://github.com/AlexGladkov/claude-in-mobile.git",
         "ref": "v4.1.0"
+      }
+    },
+    "Kotlin": {
+      "source": {
+        "source": "github",
+        "repo": "Kotlin/kotlin-agent-skills"
       }
     },
     "android-skills": {
@@ -256,5 +249,12 @@
         "repo": "firebase/agent-skills"
       }
     }
+  },
+  "enabledPlugins": {
+    "cuckcoder@cuckcoder": true,
+    "mcp-devices@claude-in-mobile": true,
+    "android-skills@android-skills": true,
+    "kotlin-agent-skills@Kotlin": true,
+    "firebase@firebase": true
   }
 }

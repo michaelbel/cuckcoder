@@ -1,8 +1,14 @@
 {
+  "tui": "fullscreen",
+  "language": "russian",
+  "skipDangerousModePermissionPrompt": true,
+  "agentPushNotifEnabled": true,
+  "feedbackDrafts": "off",
   "env": {
     "ENABLE_CLAUDEAI_MCP_SERVERS": "false"
   },
   "permissions": {
+    "defaultMode": "auto",
     "allow": [
       "Bash",
       "Read",
@@ -91,8 +97,7 @@
       "Bash(docker push*)",
       "Bash(pod trunk push*)",
       "Bash(firebase deploy*)"
-    ],
-    "defaultMode": "auto"
+    ]
   },
   "model": "sonnet",
   "hooks": {
@@ -251,10 +256,5 @@
         "repo": "firebase/agent-skills"
       }
     }
-  },
-  "language": "russian",
-  "tui": "fullscreen",
-  "skipDangerousModePermissionPrompt": true,
-  "agentPushNotifEnabled": true,
-  "feedbackDrafts": "off"
+  }
 }

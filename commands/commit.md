@@ -1,8 +1,12 @@
 ---
 description: Сгруппировать все текущие изменения в осмысленные коммиты
+when_to_use: >-
+  Используй, когда пользователь просит закоммитить все текущие изменения рабочего дерева одним или
+  несколькими целевыми коммитами, либо говорит «закоммить», «сделай коммит», «commit everything».
 model: claude-haiku-4-5-20251001
+effort: low
 allowed-tools: Bash(git status:*), Bash(git diff:*), Bash(git add:*), Bash(git commit:*), Bash(git log:*), Bash(git restore:*)
-disable-model-invocation: true
+disable-model-invocation: false
 ---
 
 Закоммить все изменения рабочего дерева. Без длинных рассуждений — действуй.

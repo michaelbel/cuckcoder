@@ -1,9 +1,14 @@
 ---
 description: Собрать через Gradle и поставить любой объявленный build variant APK на устройство в обход INSTALL_BASELINE_PROFILE_FAILED
-model: claude-haiku-4-5-20251001
-allowed-tools: Bash(adb:*), Bash(find:*), Bash(ls:*), Bash(bash:*), Bash(aapt2:*), Bash(./gradlew:*), Bash(../gradlew:*), AskUserQuestion
+when_to_use: >-
+  Используй, когда пользователь просит собрать и поставить APK на подключённое устройство, обойти
+  `INSTALL_BASELINE_PROFILE_FAILED`, либо говорит «поставь APK», «собери и установи на устройство»,
+  «install the apk».
 argument-hint: "[variant, напр. uatRelease | prodDebug | release]"
-disable-model-invocation: true
+model: claude-haiku-4-5-20251001
+effort: low
+allowed-tools: Bash(adb:*), Bash(find:*), Bash(ls:*), Bash(bash:*), Bash(aapt2:*), Bash(./gradlew:*), Bash(../gradlew:*), AskUserQuestion
+disable-model-invocation: false
 ---
 
 Универсальная сборка и установка APK для любого Android-проекта. Запускать из корня проекта

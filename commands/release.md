@@ -1,8 +1,13 @@
 ---
 description: Поднять версию MCP-пакета, закоммитить, запушить и поставить релизный тег
-model: claude-haiku-4-5-20251001
-allowed-tools: Bash(git status:*), Bash(git rev-parse:*), Bash(git add:*), Bash(git commit:*), Bash(git push:*), Bash(git tag:*), Bash(git log:*), Bash(git checkout:*), Bash(npm:*), Bash(node:*), Bash(ls:*), Bash(diff:*), Bash(comm:*), Bash(wc:*), Read, Edit, Grep, Glob
+when_to_use: >-
+  Используй, когда пользователь просит выпустить релиз npm-пакета `@michaelbel/cuckcoder-mcp` —
+  поднять версию, закоммитить, запушить и поставить релизный тег, либо говорит «релиз», «release»,
+  «опубликуй новую версию пакета».
 argument-hint: "[X.Y.Z]"
+model: claude-haiku-4-5-20251001
+effort: low
+allowed-tools: Bash(git status:*), Bash(git rev-parse:*), Bash(git add:*), Bash(git commit:*), Bash(git push:*), Bash(git tag:*), Bash(git log:*), Bash(git checkout:*), Bash(npm:*), Bash(node:*), Bash(ls:*), Bash(diff:*), Bash(comm:*), Bash(wc:*), Read, Edit, Grep, Glob
 disable-model-invocation: true
 ---
 

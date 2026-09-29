@@ -3,7 +3,7 @@
  * file and reason, and exits non-zero if anything fails. Each check enforces a current repository
  * contract or prevents a previously fixed regression.
  */
-import { existsSync, lstatSync, readFileSync, readdirSync, readlinkSync } from "node:fs";
+import { existsSync, lstatSync, readFileSync, readdirSync } from "node:fs";
 import { dirname, join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 import { parseFrontmatter } from "../src/frontmatter.js";
@@ -108,21 +108,7 @@ if (!foundAnyImport) {
   fail(agentsMdPath, "no '@rules/...' imports found — expected at least one");
 }
 
-// ─── 4. CLAUDE.md / GEMINI.md are symlinks to AGENTS.md ───────────────────────────────────────
-
-for (const linkName of ["CLAUDE.md", "GEMINI.md"]) {
-  const linkPath = join(repoRoot, linkName);
-  if (!existsSync(linkPath) || !lstatSync(linkPath).isSymbolicLink()) {
-    fail(linkPath, `expected '${linkName}' to be a symlink to AGENTS.md`);
-    continue;
-  }
-  const target = readlinkSync(linkPath);
-  if (target !== "AGENTS.md") {
-    fail(linkPath, `symlink target is '${target}', expected 'AGENTS.md'`);
-  }
-}
-
-// ─── 5. package.json version has a single source of truth (no hardcoded literal in server code) ──
+// ─── 4. package.json version has a single source of truth (no hardcoded literal in server code) ──
 
 const packageJsonPath = join(mcpDir, "package.json");
 const packageJson = JSON.parse(readText(packageJsonPath)) as { version: string };
@@ -136,7 +122,7 @@ for (const relativeSrc of ["src/server.ts", "src/index.ts"]) {
   }
 }
 
-// ─── 6. No execSync / run_skill left in mcp/src ───────────────────────────────────────────────
+// ─── 5. No execSync / run_skill left in mcp/src ───────────────────────────────────────────────
 
 function listFilesRecursive(dir: string): string[] {
   const results: string[] = [];
@@ -165,7 +151,7 @@ for (const file of listFilesRecursive(srcDir)) {
   }
 }
 
-// ─── 7. Rule/skill drift regressions ─────────────────────────────────────────────────────────
+// ─── 6. Rule/skill drift regressions ─────────────────────────────────────────────────────────
 
 const newScreenSkill = readText(join(skillsDir, "create-feature-scaffold-screen", "SKILL.md"));
 if (newScreenSkill.includes("viewModelScope")) {
@@ -199,7 +185,7 @@ if (newBottomSheetSkill.includes("height(0.dp)")) {
   fail(join(skillsDir, "create-feature-bottom-sheet", "SKILL.md"), "regression: zero-height Spacer reintroduced");
 }
 
-// ─── 8. README's tool table matches the tools actually registered in server.ts ────────────────
+// ─── 7. README's tool table matches the tools actually registered in server.ts ────────────────
 
 const readmePath = join(repoRoot, "README.md");
 const readmeText = readText(readmePath);
@@ -220,7 +206,7 @@ if (/\|\s*`run_skill`\s*\|/.test(readmeText)) {
   fail(readmePath, "README's tool table still lists the removed 'run_skill' tool");
 }
 
-// ─── 9. README's skill list and summary count match skills/ on disk ───────────────────────────
+// ─── 8. README's skill list and summary count match skills/ on disk ───────────────────────────
 
 const skillsSectionMatch = readmeText.match(/## Скиллы\n([\s\S]*?)\n## /);
 if (!skillsSectionMatch) {
@@ -250,7 +236,7 @@ if (!skillsSectionMatch) {
   }
 }
 
-// ─── 10. README's agent table and summary count match agents/ on disk ─────────────────────────
+// ─── 9. README's agent table and summary count match agents/ on disk ─────────────────────────
 
 const agentsDir = join(repoRoot, "agents");
 const agentFiles = readdirSync(agentsDir).filter((entry) => entry.endsWith(".md"));

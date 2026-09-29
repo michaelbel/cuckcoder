@@ -42,9 +42,7 @@ GuideKit дополнительно требует:
 
 В создаваемом репозитории:
 
-- `AGENTS.md` — реальный файл;
-- `CLAUDE.md` — symlink на `AGENTS.md`;
-- `GEMINI.md` — symlink на `AGENTS.md`.
+- `AGENTS.md` — реальный файл.
 
 `AGENTS.md` должен требовать:
 

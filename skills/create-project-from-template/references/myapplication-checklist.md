@@ -40,7 +40,7 @@
 
 - `.github/FUNDING.yml` и `.github/CODEOWNERS`, если owner остаётся `michaelbel`;
 - `.github/workflows/ci.yml`, пока модуль остаётся `app` и output layout не меняется;
-- `AGENTS.md` и симлинки `CLAUDE.md`, `GEMINI.md`;
+- `AGENTS.md`;
 - Gradle wrapper, version catalog, SDK и dependency versions;
 - launcher/splash drawables и тему как стартовое оформление, пока пользователь не запросил новый
   branding.

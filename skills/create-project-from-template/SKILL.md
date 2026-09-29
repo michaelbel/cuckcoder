@@ -57,7 +57,7 @@ IDE или build outputs.
    Не копируй `.git`, `.gradle`, `.kotlin`, `build`, `local.properties`, `.DS_Store`,
    `.claude/settings.local.json` и остальные локальные файлы `.idea`.
 4. Инициализируй новый git-репозиторий, не добавляя remote и не создавая commit без соответствующего
-   запроса пользователя. Сохрани симлинки `CLAUDE.md` и `GEMINI.md` на `AGENTS.md`.
+   запроса пользователя.
 5. До текстовых замен вычисли checksum `.github/debug-key.jks`. Сохрани файл побайтово и не меняй
    debug signing block: `keyAlias = "myapplication"`, путь к key store и существующие credentials
    остаются прежними. Не выводи credentials в лог или ответ.
@@ -78,7 +78,7 @@ IDE или build outputs.
 
 ## Проверка и завершение
 
-- Проверь, что `CLAUDE.md` и `GEMINI.md` остались симлинками, а `.idea/icon.svg` не игнорируется.
+- Проверь, что `.idea/icon.svg` не игнорируется.
 - Не обновляй SDK, AGP, Kotlin или зависимости только потому, что создан новый проект.
 - Не меняй launcher/splash artwork, CI или module names, если это не следует из отдельного запроса.
 - Шаблон вычисляет `versionCode` через `git rev-list --count HEAD`, поэтому Gradle не сможет пройти

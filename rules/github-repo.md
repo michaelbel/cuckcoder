@@ -1,7 +1,7 @@
 ---
 description: >-
   Обязательная структура GitHub-репозитория: FUNDING.yml, CODEOWNERS, .idea/icon.svg, whitelist
-  .gitignore, AGENTS.md с симлинками CLAUDE.md и GEMINI.md
+  .gitignore, AGENTS.md как файл инструкций для AI
 ---
 
 Каждый GitHub-репозиторий должен следовать этой структуре.
@@ -45,15 +45,6 @@ Cuckcoder сам исключение из этого пункта: его ко�
 ## Файлы инструкций для AI
 
 - `AGENTS.md` — основной файл инструкций (закоммичен, реальный файл)
-- `CLAUDE.md` — симлинк → `AGENTS.md`
-- `GEMINI.md` — симлинк → `AGENTS.md`
-
-Создание симлинков:
-
-```bash
-ln -s AGENTS.md CLAUDE.md
-ln -s AGENTS.md GEMINI.md
-```
 
 ---
 
@@ -65,5 +56,3 @@ ln -s AGENTS.md GEMINI.md
 - [ ] `.idea/icon.svg` присутствует и отслеживается
 - [ ] `.gitignore` с `.claude/`, `.idea/`, `!.idea/icon.svg`
 - [ ] `AGENTS.md` закоммичен
-- [ ] `CLAUDE.md` симлинк → `AGENTS.md`
-- [ ] `GEMINI.md` симлинк → `AGENTS.md`

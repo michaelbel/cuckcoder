@@ -243,6 +243,12 @@
         "repo": "android/skills"
       }
     },
+    "gradle-skills": {
+      "source": {
+        "source": "github",
+        "repo": "gradle/gradle-skills"
+      }
+    },
     "firebase": {
       "source": {
         "source": "github",
@@ -254,6 +260,7 @@
     "cuckcoder@cuckcoder": true,
     "mcp-devices@claude-in-mobile": true,
     "android-skills@android-skills": true,
+    "gradle-skills@gradle-skills": true,
     "kotlin-agent-skills@Kotlin": true,
     "firebase@firebase": true
   }
